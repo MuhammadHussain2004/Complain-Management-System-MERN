@@ -14,6 +14,7 @@ const CLASS_MAP = {
   Low: "badge-neutral",
   Medium: "badge-warning",
   High: "badge-danger",
+  "Super Admin": "badge-info",
 };
 
 export default function StatusBadge({ value }) {

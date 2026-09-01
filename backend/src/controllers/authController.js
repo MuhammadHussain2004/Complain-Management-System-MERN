@@ -73,6 +73,8 @@ const login = async (req, res) => {
         email: user.email,
         role: user.role,
         status: user.status,
+        isSuperAdmin: user.isSuperAdmin,
+        promotedBy: user.promotedBy,
       },
     });
   } catch (error) {
@@ -89,6 +91,8 @@ const getMe = async (req, res) => {
       email: user.email,
       role: user.role,
       status: user.status,
+      isSuperAdmin: user.isSuperAdmin,
+      promotedBy: user.promotedBy,
     },
   });
 };

@@ -13,11 +13,12 @@ const run = async () => {
   if (existing) {
     existing.role = "admin";
     existing.status = "active";
+    existing.isSuperAdmin = true;
     await existing.save();
-    console.log(`Existing account "${email}" promoted to active admin.`);
+    console.log(`Existing account "${email}" promoted to active super admin.`);
   } else {
-    await User.create({ name, email, password, role: "admin", status: "active" });
-    console.log(`Initial admin account created: ${email}`);
+    await User.create({ name, email, password, role: "admin", status: "active", isSuperAdmin: true });
+    console.log(`Initial super admin account created: ${email}`);
   }
 
   process.exit(0);

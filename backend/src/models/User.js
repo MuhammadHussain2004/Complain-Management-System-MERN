@@ -31,6 +31,20 @@ const userSchema = new mongoose.Schema(
       enum: ["pending", "active", "rejected", "deactivated"],
       default: "pending",
     },
+    // The one, permanent initial administrator (seeded via seed/seedAdmin.js).
+    // No other admin — including admins this account itself promotes — may
+    // change this account's role/status/name or delete it.
+    isSuperAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    // The admin who promoted this account to "admin", if any. That admin
+    // cannot then have their own role changed or be deleted by this account.
+    promotedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
   },
   { timestamps: true }
 );

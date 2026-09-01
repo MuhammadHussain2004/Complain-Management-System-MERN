@@ -187,6 +187,12 @@ export default function ManageUsers() {
             <tbody>
               {users.map((u) => {
                 const isSelf = u._id === currentUser.id;
+                const isSuperAdminRow = u.isSuperAdmin;
+                const isMyPromoter = currentUser.promotedBy === u._id;
+                const roleLocked = isSelf || isSuperAdminRow || isMyPromoter;
+                const deleteLocked = isSelf || isSuperAdminRow || isMyPromoter;
+                const statusLocked = isSelf || isSuperAdminRow;
+                const nameLocked = isSuperAdminRow && !isSelf;
                 const isEditingName = editingNameId === u._id;
                 return (
                   <tr key={u._id}>
@@ -217,9 +223,12 @@ export default function ManageUsers() {
                       ) : (
                         <div className="inline-edit">
                           <span>{u.name}</span>
-                          <button className="btn btn-outline btn-sm" onClick={() => startEditName(u)}>
-                            Edit
-                          </button>
+                          {isSuperAdminRow && <StatusBadge value="Super Admin" />}
+                          {!nameLocked && (
+                            <button className="btn btn-outline btn-sm" onClick={() => startEditName(u)}>
+                              Edit
+                            </button>
+                          )}
                         </div>
                       )}
                     </td>
@@ -227,7 +236,7 @@ export default function ManageUsers() {
                     <td>
                       <select
                         value={u.role}
-                        disabled={isSelf}
+                        disabled={roleLocked}
                         onChange={(e) => handleRoleChange(u, e.target.value)}
                       >
                         <option value="user">user</option>
@@ -250,17 +259,25 @@ export default function ManageUsers() {
                             </button>
                           </>
                         )}
-                        {(u.status === "active" || u.status === "deactivated") && !isSelf && (
+                        {(u.status === "active" || u.status === "deactivated") && !statusLocked && (
                           <button className="btn btn-outline btn-sm" onClick={() => handleToggleStatus(u)}>
                             {u.status === "active" ? "Deactivate" : "Activate"}
                           </button>
                         )}
-                        {!isSelf && (
+                        {!deleteLocked && (
                           <button className="btn btn-danger btn-sm" onClick={() => setPendingDelete(u)}>
                             Delete
                           </button>
                         )}
                         {isSelf && <span style={{ color: "var(--color-text-muted)", fontSize: "0.8rem" }}>You</span>}
+                        {!isSelf && isSuperAdminRow && (
+                          <span style={{ color: "var(--color-text-muted)", fontSize: "0.8rem" }}>Protected</span>
+                        )}
+                        {!isSelf && !isSuperAdminRow && isMyPromoter && (
+                          <span style={{ color: "var(--color-text-muted)", fontSize: "0.8rem" }}>
+                            Promoted you — protected
+                          </span>
+                        )}
                       </div>
                     </td>
                   </tr>

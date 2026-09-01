@@ -1,6 +1,19 @@
 const User = require("../models/User");
 const Complaint = require("../models/Complaint");
 
+// The super admin can never be touched by anyone else. Beyond that, an admin
+// that was promoted by another admin cannot act against the admin who
+// promoted them (role change / delete) — returns a message if blocked.
+const guardAgainstProtectedTarget = (target, actor, { includePromoter = true } = {}) => {
+  if (target.isSuperAdmin) {
+    return "The super admin's account cannot be modified.";
+  }
+  if (includePromoter && actor.promotedBy && actor.promotedBy.equals(target._id)) {
+    return "You cannot modify the admin who promoted you to admin.";
+  }
+  return null;
+};
+
 // GET /api/admin/users?status=pending&role=user&search=john
 const getUsers = async (req, res) => {
   try {
@@ -80,6 +93,11 @@ const setUserStatus = async (req, res) => {
       return res.status(400).json({ message: "You cannot change your own account status" });
     }
 
+    const guardMessage = guardAgainstProtectedTarget(user, req.user, { includePromoter: false });
+    if (guardMessage) {
+      return res.status(403).json({ message: guardMessage });
+    }
+
     user.status = status;
     await user.save();
     return res.status(200).json({ message: `User ${status}`, user });
@@ -103,6 +121,17 @@ const setUserRole = async (req, res) => {
       return res.status(400).json({ message: "You cannot change your own role" });
     }
 
+    const guardMessage = guardAgainstProtectedTarget(user, req.user);
+    if (guardMessage) {
+      return res.status(403).json({ message: guardMessage });
+    }
+
+    // Record who promoted this account to admin, so that admin is protected
+    // from this account later (but not on a no-op admin -> admin update).
+    if (role === "admin" && user.role !== "admin") {
+      user.promotedBy = req.user._id;
+    }
+
     user.role = role;
     await user.save();
     return res.status(200).json({ message: "User role updated", user });
@@ -122,6 +151,10 @@ const updateUserName = async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    if (user.isSuperAdmin && !user._id.equals(req.user._id)) {
+      return res.status(403).json({ message: "The super admin's name can only be changed by the super admin." });
+    }
+
     user.name = name.trim();
     await user.save();
     return res.status(200).json({ message: "User name updated", user });
@@ -138,6 +171,11 @@ const deleteUser = async (req, res) => {
 
     if (user._id.equals(req.user._id)) {
       return res.status(400).json({ message: "You cannot delete your own account" });
+    }
+
+    const guardMessage = guardAgainstProtectedTarget(user, req.user);
+    if (guardMessage) {
+      return res.status(403).json({ message: guardMessage });
     }
 
     const unresolvedCount = await Complaint.countDocuments({
