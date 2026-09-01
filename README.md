@@ -76,6 +76,21 @@ cp .env.example .env      # points to the backend API URL
 npm run dev                 # starts on http://localhost:5173
 ```
 
+## Deployment (Vercel)
+
+Both `backend/` and `frontend/` are deployed as **separate Vercel projects** from the same GitHub repo,
+each with its own "Root Directory" setting.
+
+- `backend/vercel.json` rewrites all requests to `backend/api/index.js`, which wraps the Express app
+  as a single serverless function (the app itself is unchanged — same routes, same controllers).
+- `frontend/vercel.json` rewrites all paths to `index.html` so client-side routing (React Router) works
+  on a hard refresh / direct link.
+
+Backend env vars (Vercel project settings → Environment Variables): `MONGO_URI`, `JWT_SECRET`,
+`JWT_EXPIRES_IN`, `CLIENT_URL` (the deployed frontend URL), `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`.
+
+Frontend env var: `VITE_API_URL` set to `https://<your-backend>.vercel.app/api`.
+
 ## Local Development Flow
 
 1. Start MongoDB, then the backend (`npm run dev` in `backend/`).
