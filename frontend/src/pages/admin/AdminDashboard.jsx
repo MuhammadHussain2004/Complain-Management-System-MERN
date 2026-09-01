@@ -4,6 +4,8 @@ import { getComplaintStatsRequest } from "../../api/complaints";
 import { getUsersRequest } from "../../api/users";
 import StatCard from "../../components/common/StatCard";
 import Spinner from "../../components/common/Spinner";
+import useInterval from "../../hooks/useInterval";
+import { POLL_INTERVAL_MS } from "../../constants";
 import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
@@ -11,14 +13,20 @@ export default function AdminDashboard() {
   const [pendingUsers, setPendingUsers] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadDashboard = (silent = false) => {
     Promise.all([getComplaintStatsRequest(), getUsersRequest({ status: "pending" })])
       .then(([statsRes, usersRes]) => {
         setStats(statsRes.data);
         setPendingUsers(usersRes.data.users.length);
       })
-      .finally(() => setLoading(false));
-  }, []);
+      .finally(() => {
+        if (!silent) setLoading(false);
+      });
+  };
+
+  useEffect(() => loadDashboard(false), []);
+
+  useInterval(() => loadDashboard(true), POLL_INTERVAL_MS);
 
   if (loading || !stats) return <Spinner />;
 

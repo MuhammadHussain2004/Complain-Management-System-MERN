@@ -1,11 +1,24 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { loginRequest, registerRequest, getMeRequest } from "../api/auth";
+import useInterval from "../hooks/useInterval";
+import { POLL_INTERVAL_MS } from "../constants";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const refreshUser = useCallback(async () => {
+    if (!sessionStorage.getItem("scms_token")) return;
+    try {
+      const res = await getMeRequest();
+      setUser(res.data.user);
+    } catch {
+      sessionStorage.removeItem("scms_token");
+      setUser(null);
+    }
+  }, []);
 
   useEffect(() => {
     // One-time cleanup: earlier versions of this app stored the token in
@@ -19,14 +32,13 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    getMeRequest()
-      .then((res) => setUser(res.data.user))
-      .catch(() => {
-        sessionStorage.removeItem("scms_token");
-        setUser(null);
-      })
-      .finally(() => setLoading(false));
+    refreshUser().finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Keeps the logged-in user's name/role/status in sync (e.g. Navbar) if an
+  // admin edits them elsewhere, without needing a manual page reload.
+  useInterval(refreshUser, user ? POLL_INTERVAL_MS : null);
 
   const login = async (email, password) => {
     const res = await loginRequest({ email, password });

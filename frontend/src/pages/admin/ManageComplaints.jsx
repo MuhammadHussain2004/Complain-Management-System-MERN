@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { getAllComplaintsRequest, updateComplaintStatusRequest } from "../../api/complaints";
-import { CATEGORIES, PRIORITIES, COMPLAINT_STATUSES } from "../../constants";
+import { CATEGORIES, PRIORITIES, COMPLAINT_STATUSES, POLL_INTERVAL_MS } from "../../constants";
 import StatusBadge from "../../components/common/StatusBadge";
 import UpdateStatusModal from "../../components/complaints/UpdateStatusModal";
 import Alert from "../../components/common/Alert";
 import Spinner from "../../components/common/Spinner";
+import useInterval from "../../hooks/useInterval";
 
 export default function ManageComplaints() {
   const [complaints, setComplaints] = useState([]);
@@ -14,20 +15,32 @@ export default function ManageComplaints() {
   const [selected, setSelected] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const loadComplaints = () => {
-    setLoading(true);
+  const loadComplaints = (silent = false) => {
+    if (!silent) setLoading(true);
     const params = Object.fromEntries(Object.entries(filters).filter(([, v]) => v));
     getAllComplaintsRequest(params)
       .then((res) => setComplaints(res.data.complaints))
-      .catch(() => setError("Failed to load complaints"))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (!silent) setError("Failed to load complaints");
+      })
+      .finally(() => {
+        if (!silent) setLoading(false);
+      });
   };
 
   useEffect(() => {
-    const timeout = setTimeout(loadComplaints, 300);
+    const timeout = setTimeout(() => loadComplaints(false), 300);
     return () => clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
+
+  // Background refresh so newly submitted complaints (or status/edits made
+  // by the user) show up without a manual reload. Paused while the review
+  // modal is open so it can't change the list out from under it.
+  useInterval(() => {
+    if (selected) return;
+    loadComplaints(true);
+  }, POLL_INTERVAL_MS);
 
   const handleFilterChange = (field, value) => {
     setFilters((prev) => ({ ...prev, [field]: value }));

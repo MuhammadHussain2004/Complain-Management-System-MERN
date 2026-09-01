@@ -8,6 +8,8 @@ import ComplaintCard from "../../components/complaints/ComplaintCard";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import Alert from "../../components/common/Alert";
 import Spinner from "../../components/common/Spinner";
+import useInterval from "../../hooks/useInterval";
+import { POLL_INTERVAL_MS } from "../../constants";
 import "./MyComplaints.css";
 
 export default function MyComplaints() {
@@ -18,15 +20,27 @@ export default function MyComplaints() {
   const [savingEdit, setSavingEdit] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
 
-  const loadComplaints = () => {
-    setLoading(true);
+  const loadComplaints = (silent = false) => {
+    if (!silent) setLoading(true);
     getMyComplaintsRequest()
       .then((res) => setComplaints(res.data.complaints))
-      .catch(() => setError("Failed to load complaints"))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (!silent) setError("Failed to load complaints");
+      })
+      .finally(() => {
+        if (!silent) setLoading(false);
+      });
   };
 
-  useEffect(loadComplaints, []);
+  useEffect(() => loadComplaints(false), []);
+
+  // Background refresh so an admin's status/remarks update shows up here
+  // without a manual reload. Paused while actively editing a complaint so
+  // the refresh can't overwrite unsaved edits.
+  useInterval(() => {
+    if (editingId || pendingDelete) return;
+    loadComplaints(true);
+  }, POLL_INTERVAL_MS);
 
   const handleEditSave = async (id, values) => {
     setSavingEdit(true);

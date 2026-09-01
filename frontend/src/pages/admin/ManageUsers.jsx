@@ -5,9 +5,12 @@ import {
   rejectUserRequest,
   setUserStatusRequest,
   setUserRoleRequest,
+  updateUserNameRequest,
   deleteUserRequest,
 } from "../../api/users";
 import { useAuth } from "../../context/AuthContext";
+import useInterval from "../../hooks/useInterval";
+import { POLL_INTERVAL_MS } from "../../constants";
 import StatusBadge from "../../components/common/StatusBadge";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import Alert from "../../components/common/Alert";
@@ -23,20 +26,35 @@ export default function ManageUsers() {
   const [pendingReject, setPendingReject] = useState(null);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [editingNameId, setEditingNameId] = useState(null);
+  const [nameDraft, setNameDraft] = useState("");
+  const [savingName, setSavingName] = useState(false);
 
-  const loadUsers = () => {
-    setLoading(true);
+  const loadUsers = (silent = false) => {
+    if (!silent) setLoading(true);
     getUsersRequest({ status: statusFilter || undefined, search: search || undefined })
       .then((res) => setUsers(res.data.users))
-      .catch(() => setError("Failed to load users"))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (!silent) setError("Failed to load users");
+      })
+      .finally(() => {
+        if (!silent) setLoading(false);
+      });
   };
 
   useEffect(() => {
-    const timeout = setTimeout(loadUsers, 300);
+    const timeout = setTimeout(() => loadUsers(false), 300);
     return () => clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, search]);
+
+  // Background refresh so changes made here (or by another admin) show up
+  // without a manual reload. Paused while a row is actively being edited so
+  // an in-flight refresh can't wipe out unsaved input.
+  useInterval(() => {
+    if (editingNameId || pendingReject || pendingDelete) return;
+    loadUsers(true);
+  }, POLL_INTERVAL_MS);
 
   const updateLocalUser = (updated) => {
     setUsers((prev) => prev.map((u) => (u._id === updated._id ? updated : u)));
@@ -82,6 +100,29 @@ export default function ManageUsers() {
       updateLocalUser(res.data.user);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update role");
+    }
+  };
+
+  const startEditName = (u) => {
+    setEditingNameId(u._id);
+    setNameDraft(u.name);
+  };
+
+  const handleSaveName = async (id) => {
+    if (!nameDraft.trim()) {
+      setError("Name cannot be empty");
+      return;
+    }
+    setSavingName(true);
+    setError("");
+    try {
+      const res = await updateUserNameRequest(id, nameDraft.trim());
+      updateLocalUser(res.data.user);
+      setEditingNameId(null);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update name");
+    } finally {
+      setSavingName(false);
     }
   };
 
@@ -144,9 +185,42 @@ export default function ManageUsers() {
             <tbody>
               {users.map((u) => {
                 const isSelf = u._id === currentUser.id;
+                const isEditingName = editingNameId === u._id;
                 return (
                   <tr key={u._id}>
-                    <td>{u.name}</td>
+                    <td>
+                      {isEditingName ? (
+                        <div className="inline-edit">
+                          <input
+                            type="text"
+                            value={nameDraft}
+                            onChange={(e) => setNameDraft(e.target.value)}
+                            autoFocus
+                          />
+                          <button
+                            className="btn btn-primary btn-sm"
+                            disabled={savingName}
+                            onClick={() => handleSaveName(u._id)}
+                          >
+                            {savingName ? "Saving..." : "Save"}
+                          </button>
+                          <button
+                            className="btn btn-outline btn-sm"
+                            disabled={savingName}
+                            onClick={() => setEditingNameId(null)}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="inline-edit">
+                          <span>{u.name}</span>
+                          <button className="btn btn-outline btn-sm" onClick={() => startEditName(u)}>
+                            Edit
+                          </button>
+                        </div>
+                      )}
+                    </td>
                     <td>{u.email}</td>
                     <td>
                       <select

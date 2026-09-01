@@ -4,17 +4,26 @@ import { getMyComplaintsRequest } from "../../api/complaints";
 import { useAuth } from "../../context/AuthContext";
 import StatCard from "../../components/common/StatCard";
 import Spinner from "../../components/common/Spinner";
+import useInterval from "../../hooks/useInterval";
+import { POLL_INTERVAL_MS } from "../../constants";
 
 export default function UserDashboard() {
   const { user } = useAuth();
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadComplaints = (silent = false) => {
     getMyComplaintsRequest()
       .then((res) => setComplaints(res.data.complaints))
-      .finally(() => setLoading(false));
-  }, []);
+      .finally(() => {
+        if (!silent) setLoading(false);
+      });
+  };
+
+  useEffect(() => loadComplaints(false), []);
+
+  // Keeps the stat tiles current if an admin updates a status elsewhere.
+  useInterval(() => loadComplaints(true), POLL_INTERVAL_MS);
 
   const count = (status) => complaints.filter((c) => c.status === status).length;
 
