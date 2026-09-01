@@ -8,6 +8,11 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // One-time cleanup: earlier versions of this app stored the token in
+    // localStorage (shared across tabs); purge any leftover from before the
+    // switch to sessionStorage so it doesn't sit around unused.
+    localStorage.removeItem("scms_token");
+
     const token = sessionStorage.getItem("scms_token");
     if (!token) {
       setLoading(false);
