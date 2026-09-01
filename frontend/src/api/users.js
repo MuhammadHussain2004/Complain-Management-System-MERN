@@ -5,3 +5,4 @@ export const approveUserRequest = (id) => api.patch(`/admin/users/${id}/approve`
 export const rejectUserRequest = (id) => api.patch(`/admin/users/${id}/reject`);
 export const setUserStatusRequest = (id, status) => api.patch(`/admin/users/${id}/status`, { status });
 export const setUserRoleRequest = (id, role) => api.patch(`/admin/users/${id}/role`, { role });
+export const deleteUserRequest = (id) => api.delete(`/admin/users/${id}`);

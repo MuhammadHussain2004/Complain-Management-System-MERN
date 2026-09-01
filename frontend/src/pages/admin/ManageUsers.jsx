@@ -5,6 +5,7 @@ import {
   rejectUserRequest,
   setUserStatusRequest,
   setUserRoleRequest,
+  deleteUserRequest,
 } from "../../api/users";
 import { useAuth } from "../../context/AuthContext";
 import StatusBadge from "../../components/common/StatusBadge";
@@ -20,6 +21,8 @@ export default function ManageUsers() {
   const [statusFilter, setStatusFilter] = useState("");
   const [search, setSearch] = useState("");
   const [pendingReject, setPendingReject] = useState(null);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const loadUsers = () => {
     setLoading(true);
@@ -79,6 +82,21 @@ export default function ManageUsers() {
       updateLocalUser(res.data.user);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update role");
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!pendingDelete) return;
+    setError("");
+    setDeleting(true);
+    try {
+      await deleteUserRequest(pendingDelete._id);
+      setUsers((prev) => prev.filter((u) => u._id !== pendingDelete._id));
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete user");
+    } finally {
+      setDeleting(false);
+      setPendingDelete(null);
     }
   };
 
@@ -161,6 +179,11 @@ export default function ManageUsers() {
                             {u.status === "active" ? "Deactivate" : "Activate"}
                           </button>
                         )}
+                        {!isSelf && (
+                          <button className="btn btn-danger btn-sm" onClick={() => setPendingDelete(u)}>
+                            Delete
+                          </button>
+                        )}
                         {isSelf && <span style={{ color: "var(--color-text-muted)", fontSize: "0.8rem" }}>You</span>}
                       </div>
                     </td>
@@ -179,6 +202,17 @@ export default function ManageUsers() {
           confirmLabel="Reject"
           onConfirm={handleRejectConfirm}
           onCancel={() => setPendingReject(null)}
+        />
+      )}
+
+      {pendingDelete && (
+        <ConfirmDialog
+          title="Delete User"
+          message={`Permanently delete "${pendingDelete.name}" (${pendingDelete.email})? This also deletes all of their complaints. This is only allowed if none of their complaints are still Pending or In Progress. This cannot be undone.`}
+          confirmLabel={deleting ? "Deleting..." : "Delete"}
+          confirmDisabled={deleting}
+          onConfirm={handleDeleteConfirm}
+          onCancel={() => setPendingDelete(null)}
         />
       )}
     </div>

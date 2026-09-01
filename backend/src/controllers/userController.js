@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Complaint = require("../models/Complaint");
 
 // GET /api/admin/users?status=pending&role=user&search=john
 const getUsers = async (req, res) => {
@@ -110,6 +111,37 @@ const setUserRole = async (req, res) => {
   }
 };
 
+// DELETE /api/admin/users/:id
+const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (user._id.equals(req.user._id)) {
+      return res.status(400).json({ message: "You cannot delete your own account" });
+    }
+
+    const unresolvedCount = await Complaint.countDocuments({
+      user: user._id,
+      status: { $nin: ["Resolved", "Rejected"] },
+    });
+
+    if (unresolvedCount > 0) {
+      return res.status(400).json({
+        message:
+          "This user has complaint(s) that are not yet Resolved or Rejected. Update those complaints before deleting the account.",
+      });
+    }
+
+    await Complaint.deleteMany({ user: user._id });
+    await user.deleteOne();
+
+    return res.status(200).json({ message: "User and their complaints deleted" });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to delete user", error: error.message });
+  }
+};
+
 module.exports = {
   getUsers,
   getUserById,
@@ -117,4 +149,5 @@ module.exports = {
   rejectUser,
   setUserStatus,
   setUserRole,
+  deleteUser,
 };
