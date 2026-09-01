@@ -1,0 +1,22 @@
+.stat-card {
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.stat-warning .stat-value { color: var(--color-warning); }
+.stat-info .stat-value { color: var(--color-info); }
+.stat-success .stat-value { color: var(--color-success); }
+.stat-danger .stat-value { color: var(--color-danger); }
+.stat-primary .stat-value { color: var(--color-primary); }

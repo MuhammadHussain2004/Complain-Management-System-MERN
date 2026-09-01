@@ -1,0 +1,18 @@
+.complaint-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 560px;
+}
+
+.complaint-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+@media (max-width: 480px) {
+  .complaint-form-row {
+    grid-template-columns: 1fr;
+  }
+}
