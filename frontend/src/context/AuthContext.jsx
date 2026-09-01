@@ -8,7 +8,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("scms_token");
+    const token = sessionStorage.getItem("scms_token");
     if (!token) {
       setLoading(false);
       return;
@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
     getMeRequest()
       .then((res) => setUser(res.data.user))
       .catch(() => {
-        localStorage.removeItem("scms_token");
+        sessionStorage.removeItem("scms_token");
         setUser(null);
       })
       .finally(() => setLoading(false));
@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const res = await loginRequest({ email, password });
-    localStorage.setItem("scms_token", res.data.token);
+    sessionStorage.setItem("scms_token", res.data.token);
     setUser(res.data.user);
     return res.data.user;
   };
@@ -36,7 +36,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    localStorage.removeItem("scms_token");
+    sessionStorage.removeItem("scms_token");
     setUser(null);
   };
 
