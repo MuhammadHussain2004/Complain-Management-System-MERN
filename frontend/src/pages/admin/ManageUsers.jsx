@@ -15,6 +15,8 @@ import StatusBadge from "../../components/common/StatusBadge";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import Alert from "../../components/common/Alert";
 import Spinner from "../../components/common/Spinner";
+import EmptyState from "../../components/common/EmptyState";
+import { IconUsers } from "../../components/common/icons";
 
 export default function ManageUsers() {
   const { user: currentUser } = useAuth();
@@ -168,7 +170,7 @@ export default function ManageUsers() {
       {loading ? (
         <Spinner />
       ) : users.length === 0 ? (
-        <div className="empty-state card">No users found.</div>
+        <EmptyState icon={IconUsers} message="No users found." />
       ) : (
         <div className="table-wrap">
           <table className="data-table">

@@ -31,9 +31,9 @@ export default function ComplaintCard({ complaint, isEditing, onEditStart, onEdi
       <p className="complaint-card-desc">{complaint.description}</p>
 
       <div className="complaint-card-meta">
-        <span>Category: {complaint.category}</span>
-        <span>Priority: {complaint.priority}</span>
-        <span>Submitted: {new Date(complaint.createdAt).toLocaleDateString()}</span>
+        <span>{complaint.category}</span>
+        <StatusBadge value={complaint.priority} />
+        <span>Submitted {new Date(complaint.createdAt).toLocaleDateString()}</span>
       </div>
 
       {complaint.adminRemarks && (

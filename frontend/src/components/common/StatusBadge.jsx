@@ -11,6 +11,9 @@ const CLASS_MAP = {
   deactivated: "badge-danger",
   admin: "badge-info",
   user: "badge-neutral",
+  Low: "badge-neutral",
+  Medium: "badge-warning",
+  High: "badge-danger",
 };
 
 export default function StatusBadge({ value }) {

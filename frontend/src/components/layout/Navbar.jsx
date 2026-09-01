@@ -1,6 +1,14 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { IconShieldCheck, IconLogout } from "../common/icons";
 import "./Navbar.css";
+
+function getInitials(name) {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/);
+  const initials = parts.length > 1 ? parts[0][0] + parts[parts.length - 1][0] : parts[0].slice(0, 2);
+  return initials.toUpperCase();
+}
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -28,7 +36,15 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar-inner">
-        <div className="navbar-brand">Smart Complaint System</div>
+        <NavLink to="/" className="navbar-brand">
+          <span className="navbar-brand-mark">
+            <IconShieldCheck size={18} />
+          </span>
+          <span className="navbar-brand-text">
+            <span className="navbar-brand-name">Complain</span>
+            <span className="navbar-brand-sub">Management System</span>
+          </span>
+        </NavLink>
 
         {user && (
           <nav className="navbar-links">
@@ -47,11 +63,15 @@ export default function Navbar() {
         <div className="navbar-user">
           {user ? (
             <>
-              <span className="navbar-username">
-                {user.name} <span className="navbar-role">({user.role})</span>
-              </span>
+              <div className="navbar-identity">
+                <span className="navbar-avatar">{getInitials(user.name)}</span>
+                <span className="navbar-identity-text">
+                  <span className="navbar-username">{user.name}</span>
+                  <span className="navbar-role">{user.role}</span>
+                </span>
+              </div>
               <button className="btn btn-outline btn-sm" onClick={handleLogout}>
-                Logout
+                <IconLogout size={15} /> Logout
               </button>
             </>
           ) : (

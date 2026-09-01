@@ -5,6 +5,8 @@ import StatusBadge from "../../components/common/StatusBadge";
 import UpdateStatusModal from "../../components/complaints/UpdateStatusModal";
 import Alert from "../../components/common/Alert";
 import Spinner from "../../components/common/Spinner";
+import EmptyState from "../../components/common/EmptyState";
+import { IconInbox } from "../../components/common/icons";
 import useInterval from "../../hooks/useInterval";
 
 export default function ManageComplaints() {
@@ -104,7 +106,7 @@ export default function ManageComplaints() {
       {loading ? (
         <Spinner />
       ) : complaints.length === 0 ? (
-        <div className="empty-state card">No complaints match these filters.</div>
+        <EmptyState icon={IconInbox} message="No complaints match these filters." />
       ) : (
         <div className="table-wrap">
           <table className="data-table">
@@ -125,7 +127,9 @@ export default function ManageComplaints() {
                   <td>{c.title}</td>
                   <td>{c.user?.name}</td>
                   <td>{c.category}</td>
-                  <td>{c.priority}</td>
+                  <td>
+                    <StatusBadge value={c.priority} />
+                  </td>
                   <td>
                     <StatusBadge value={c.status} />
                   </td>

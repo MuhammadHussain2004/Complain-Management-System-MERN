@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Alert from "../../components/common/Alert";
-import "./AuthPages.css";
+import AuthLayout from "./AuthLayout";
 
 export default function Login() {
   const { login } = useAuth();
@@ -31,49 +31,44 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-wrap">
-      <div className="auth-card card">
-        <h1>Welcome back</h1>
-        <p className="subtitle">Log in to the Smart Complaint Management System</p>
+    <AuthLayout title="Welcome back" subtitle="Log in to the Complain Management System">
+      <Alert type="error">{error}</Alert>
 
-        <Alert type="error">{error}</Alert>
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <div className="form-field">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            value={form.email}
+            onChange={handleChange}
+            placeholder="you@example.com"
+          />
+        </div>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="form-field">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              value={form.email}
-              onChange={handleChange}
-              placeholder="you@example.com"
-            />
-          </div>
+        <div className="form-field">
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            value={form.password}
+            onChange={handleChange}
+            placeholder="••••••••"
+          />
+        </div>
 
-          <div className="form-field">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              value={form.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-            />
-          </div>
+        <button className="btn btn-primary btn-block" type="submit" disabled={submitting}>
+          {submitting ? "Logging in..." : "Log In"}
+        </button>
+      </form>
 
-          <button className="btn btn-primary btn-block" type="submit" disabled={submitting}>
-            {submitting ? "Logging in..." : "Log In"}
-          </button>
-        </form>
-
-        <p className="auth-switch">
-          Don't have an account? <Link to="/register">Register here</Link>
-        </p>
-      </div>
-    </div>
+      <p className="auth-switch">
+        Don't have an account? <Link to="/register">Register here</Link>
+      </p>
+    </AuthLayout>
   );
 }

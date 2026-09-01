@@ -8,6 +8,8 @@ import ComplaintCard from "../../components/complaints/ComplaintCard";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import Alert from "../../components/common/Alert";
 import Spinner from "../../components/common/Spinner";
+import EmptyState from "../../components/common/EmptyState";
+import { IconInbox } from "../../components/common/icons";
 import useInterval from "../../hooks/useInterval";
 import { POLL_INTERVAL_MS } from "../../constants";
 import "./MyComplaints.css";
@@ -79,7 +81,7 @@ export default function MyComplaints() {
       <Alert type="error">{error}</Alert>
 
       {complaints.length === 0 ? (
-        <div className="empty-state card">You haven't submitted any complaints yet.</div>
+        <EmptyState icon={IconInbox} message="You haven't submitted any complaints yet." />
       ) : (
         <div className="complaints-list">
           {complaints.map((c) => (

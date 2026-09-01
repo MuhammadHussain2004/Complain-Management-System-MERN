@@ -17,15 +17,51 @@
 }
 
 .navbar-brand {
-  font-weight: 700;
-  font-size: 1.05rem;
-  color: var(--color-primary-dark);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
   white-space: nowrap;
+}
+
+.navbar-brand-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--gradient-brand);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+}
+
+.navbar-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.navbar-brand-name {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+.navbar-brand-sub {
+  font-size: 0.66rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .navbar-links {
   display: flex;
-  gap: var(--space-4);
+  gap: var(--space-1);
   flex-wrap: wrap;
   flex: 1;
 }
@@ -33,16 +69,21 @@
 .navbar-link {
   text-decoration: none;
   color: var(--color-text-muted);
-  font-size: 0.9rem;
-  font-weight: 500;
-  padding: 6px 4px;
-  border-bottom: 2px solid transparent;
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
-.navbar-link.active,
 .navbar-link:hover {
+  color: var(--color-text);
+  background: var(--color-surface-alt);
+}
+
+.navbar-link.active {
   color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
+  background: var(--color-primary-light);
 }
 
 .navbar-user {
@@ -52,8 +93,35 @@
   margin-left: auto;
 }
 
+.navbar-identity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.navbar-identity-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
 .navbar-username {
-  font-size: 0.88rem;
+  font-size: 0.85rem;
+  font-weight: 600;
   color: var(--color-text);
   white-space: nowrap;
 }
@@ -61,6 +129,7 @@
 .navbar-role {
   color: var(--color-text-muted);
   text-transform: capitalize;
+  font-size: 0.72rem;
 }
 
 @media (max-width: 720px) {

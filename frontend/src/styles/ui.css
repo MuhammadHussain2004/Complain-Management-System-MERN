@@ -10,30 +10,38 @@
   border: 1px solid transparent;
   font-size: 0.9rem;
   font-weight: 600;
-  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease,
+    box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
 .btn-primary {
   background: var(--color-primary);
   color: #fff;
+  box-shadow: 0 1px 2px rgba(79, 70, 229, 0.15), 0 4px 10px rgba(79, 70, 229, 0.18);
 }
 .btn-primary:hover:not(:disabled) {
   background: var(--color-primary-dark);
+  box-shadow: 0 1px 2px rgba(79, 70, 229, 0.2), 0 6px 14px rgba(79, 70, 229, 0.26);
 }
 
 .btn-outline {
-  background: transparent;
+  background: var(--color-surface);
   border-color: var(--color-border);
   color: var(--color-text);
 }
 .btn-outline:hover:not(:disabled) {
   border-color: var(--color-primary);
   color: var(--color-primary);
+  background: var(--color-primary-light);
 }
 
 .btn-danger {
@@ -55,6 +63,7 @@
 .btn-sm {
   padding: 6px 12px;
   font-size: 0.8rem;
+  border-radius: 7px;
 }
 
 .btn-block {
@@ -77,12 +86,18 @@
 .form-field input,
 .form-field select,
 .form-field textarea {
-  padding: 10px 12px;
+  padding: 11px 13px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text);
   font-size: 0.95rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: #9ca0b4;
 }
 
 .form-field input:focus,
@@ -90,7 +105,7 @@
 .form-field textarea:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
+  box-shadow: 0 0 0 4px var(--color-primary-light);
 }
 
 .card {
@@ -105,6 +120,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 table.data-table {
@@ -123,22 +139,24 @@ table.data-table td {
 }
 
 table.data-table th {
-  background: #fafbfd;
+  background: var(--color-surface-alt);
   color: var(--color-text-muted);
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+}
+
+table.data-table tbody tr {
+  transition: background 0.1s ease;
+}
+
+table.data-table tbody tr:hover {
+  background: var(--color-surface-alt);
 }
 
 table.data-table tr:last-child td {
   border-bottom: none;
-}
-
-.empty-state {
-  padding: var(--space-6);
-  text-align: center;
-  color: var(--color-text-muted);
 }
 
 .actions-cell {
@@ -157,14 +175,20 @@ table.data-table tr:last-child td {
 .inline-edit input {
   padding: 6px 10px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   font-size: 0.88rem;
   min-width: 140px;
 }
 
+.inline-edit input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: var(--space-4);
   margin-bottom: var(--space-5);
 }
@@ -179,7 +203,7 @@ table.data-table tr:last-child td {
 }
 
 .page-header h1 {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
 }
 
 .filters-bar {
@@ -191,9 +215,17 @@ table.data-table tr:last-child td {
 
 .filters-bar input,
 .filters-bar select {
-  padding: 8px 12px;
+  padding: 9px 13px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   font-size: 0.88rem;
   background: var(--color-surface);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.filters-bar input:focus,
+.filters-bar select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-light);
 }

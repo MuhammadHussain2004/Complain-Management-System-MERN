@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Alert from "../../components/common/Alert";
-import "./AuthPages.css";
+import AuthLayout from "./AuthLayout";
 
 export default function Register() {
   const { register } = useAuth();
@@ -39,80 +39,76 @@ export default function Register() {
   };
 
   return (
-    <div className="auth-wrap">
-      <div className="auth-card card">
-        <h1>Create your account</h1>
-        <p className="subtitle">
-          Your account will need administrator approval before you can log in.
-        </p>
+    <AuthLayout
+      title="Create your account"
+      subtitle="Your account will need administrator approval before you can log in."
+    >
+      <Alert type="error">{error}</Alert>
+      <Alert type="success">{success}</Alert>
 
-        <Alert type="error">{error}</Alert>
-        <Alert type="success">{success}</Alert>
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <div className="form-field">
+          <label htmlFor="name">Full Name</label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            required
+            value={form.name}
+            onChange={handleChange}
+            placeholder="Jane Doe"
+          />
+        </div>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="form-field">
-            <label htmlFor="name">Full Name</label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              required
-              value={form.name}
-              onChange={handleChange}
-              placeholder="Jane Doe"
-            />
-          </div>
+        <div className="form-field">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            value={form.email}
+            onChange={handleChange}
+            placeholder="you@example.com"
+          />
+        </div>
 
-          <div className="form-field">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              value={form.email}
-              onChange={handleChange}
-              placeholder="you@example.com"
-            />
-          </div>
+        <div className="form-field">
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            minLength={6}
+            value={form.password}
+            onChange={handleChange}
+            placeholder="At least 6 characters"
+          />
+        </div>
 
-          <div className="form-field">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              minLength={6}
-              value={form.password}
-              onChange={handleChange}
-              placeholder="At least 6 characters"
-            />
-          </div>
+        <div className="form-field">
+          <label htmlFor="confirmPassword">Confirm Password</label>
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            required
+            minLength={6}
+            value={form.confirmPassword}
+            onChange={handleChange}
+            placeholder="Re-enter password"
+          />
+        </div>
 
-          <div className="form-field">
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              required
-              minLength={6}
-              value={form.confirmPassword}
-              onChange={handleChange}
-              placeholder="Re-enter password"
-            />
-          </div>
+        <button className="btn btn-primary btn-block" type="submit" disabled={submitting}>
+          {submitting ? "Creating account..." : "Register"}
+        </button>
+      </form>
 
-          <button className="btn btn-primary btn-block" type="submit" disabled={submitting}>
-            {submitting ? "Creating account..." : "Register"}
-          </button>
-        </form>
-
-        <p className="auth-switch">
-          Already have an account? <Link to="/login">Log in here</Link>
-        </p>
-      </div>
-    </div>
+      <p className="auth-switch">
+        Already have an account? <Link to="/login">Log in here</Link>
+      </p>
+    </AuthLayout>
   );
 }

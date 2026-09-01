@@ -6,6 +6,7 @@ import StatCard from "../../components/common/StatCard";
 import Spinner from "../../components/common/Spinner";
 import useInterval from "../../hooks/useInterval";
 import { POLL_INTERVAL_MS } from "../../constants";
+import { IconClipboard, IconClock, IconProgress, IconCheckCircle, IconXCircle, IconPlus } from "../../components/common/icons";
 
 export default function UserDashboard() {
   const { user } = useAuth();
@@ -34,16 +35,16 @@ export default function UserDashboard() {
       <div className="page-header">
         <h1>Welcome, {user.name}</h1>
         <Link to="/user/submit-complaint" className="btn btn-primary">
-          + Submit Complaint
+          <IconPlus size={16} /> Submit Complaint
         </Link>
       </div>
 
       <div className="stats-grid">
-        <StatCard label="Total Complaints" value={complaints.length} tone="primary" />
-        <StatCard label="Pending" value={count("Pending")} tone="warning" />
-        <StatCard label="In Progress" value={count("In Progress")} tone="info" />
-        <StatCard label="Resolved" value={count("Resolved")} tone="success" />
-        <StatCard label="Rejected" value={count("Rejected")} tone="danger" />
+        <StatCard label="Total Complaints" value={complaints.length} tone="primary" icon={IconClipboard} />
+        <StatCard label="Pending" value={count("Pending")} tone="warning" icon={IconClock} />
+        <StatCard label="In Progress" value={count("In Progress")} tone="info" icon={IconProgress} />
+        <StatCard label="Resolved" value={count("Resolved")} tone="success" icon={IconCheckCircle} />
+        <StatCard label="Rejected" value={count("Rejected")} tone="danger" icon={IconXCircle} />
       </div>
 
       <p>
